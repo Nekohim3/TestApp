@@ -18,6 +18,7 @@ namespace TestApp
 
         private void EmployeeInfoEdit_Load(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("EmployeeInfoEdit: Загрузка информации о сотруднике");
             using (var db = new TestDBEntities())
             {
                 var departments = db.Department.ToList();
@@ -46,6 +47,7 @@ namespace TestApp
 
         private void Button_Save_Click(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("EmployeeInfoEdit: Сохранение информации о сотруднике");
             if (TextBox_FirstName.Text            == ""
              || TextBox_SurName.Text              == ""
              || TextBox_Position.Text             == ""
@@ -97,9 +99,10 @@ namespace TestApp
 
                     this.Close();
                 }
-                catch (System.Data.Entity.Validation.DbEntityValidationException exception)
+                catch (System.Data.Entity.Validation.DbEntityValidationException ex)
                 {
-                    MessageBox.Show($"Возникла ошибка. Возможно некоторые поля заполнены неправильно.\n\n{exception.EntityValidationErrors.First().ValidationErrors.First().ErrorMessage}", "Error",
+                    GlobalVars.Log.Info(ex, "EmployeeInfoEdit: Ошибка при сохранении информации о сотруднике");
+                    MessageBox.Show($"Возникла ошибка. Возможно некоторые поля заполнены неправильно.\n\n{ex.EntityValidationErrors.First().ValidationErrors.First().ErrorMessage}", "Error",
                                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }

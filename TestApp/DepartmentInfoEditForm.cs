@@ -16,6 +16,7 @@ namespace TestApp
 
         private void DepartmentInfoEditForm_Load(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("DepartmentInfoEditForm: Загрузка информации об отделе.");
             using (var db = new TestDBEntities())
             {
                 var departments = db.Department.ToList();
@@ -44,6 +45,7 @@ namespace TestApp
 
         private void Button_Save_Click(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("DepartmentInfoEditForm: Соранение информации об отделе.");
             if (MaskedTextBox_ID.Text == ""
              || TextBox_Name.Text     == "")
             {
@@ -97,9 +99,10 @@ namespace TestApp
 
                     this.Close();
                 }
-                catch (System.Data.Entity.Validation.DbEntityValidationException exception)
+                catch (System.Data.Entity.Validation.DbEntityValidationException ex)
                 {
-                    MessageBox.Show($"Возникла ошибка. Возможно некоторые поля заполнены неправильно.\n\n{exception.EntityValidationErrors.First().ValidationErrors.First().ErrorMessage}", "Error",
+                    GlobalVars.Log.Error(ex, "DepartmentInfoEditForm: Ошибка при сохранении информации об отделе.");
+                    MessageBox.Show($"Возникла ошибка. Возможно некоторые поля заполнены неправильно.\n\n{ex.EntityValidationErrors.First().ValidationErrors.First().ErrorMessage}", "Error",
                                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }

@@ -13,26 +13,24 @@ namespace TestApp
         {
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
-                var e = args.ExceptionObject as Exception;
+                var ex = args.ExceptionObject as Exception;
 
-                var exStr =
-                    $"{DateTime.Now.ToLongDateString()} {DateTime.Now.ToLongTimeString()}\nUnhandledException\n\nMessage:\n{e?.Message}\n\nInnerExceprionMessage:\n{e?.InnerException?.Message}\n\nSource:\n{e?.Source}\n\nStackTrace:\n{e?.StackTrace}\n\n\n";
-
-                using (var fs = new FileStream("Exception.txt", FileMode.Append, FileAccess.Write))
-                using (var sw = new StreamWriter(fs))
-                    sw.Write(exStr);
 
                 if (args.ExceptionObject is System.Data.Entity.Core.EntityException)
                 {
+                    GlobalVars.Log.Error(ex, "Не удалось установить соединение с базой данных.");
                     MessageBox.Show("Не удалось установить соединение с базой данных. Приложение будет закрыто.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 }
                 else if (false)
                 {
                     //other exceptions
+                    GlobalVars.Log.Error(ex, "Возникла ошибка!");
                 }
                 else
                 {
-                    MessageBox.Show("Возникла непредвиденная ошибка! Приложение будет закрыто. Детали находятся в файле Exception.txt", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    GlobalVars.Log.Error(ex, "Возникла непредвиденная ошибка!");
+                    MessageBox.Show("Возникла непредвиденная ошибка! Приложение будет закрыто.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
                 Process.GetCurrentProcess().Kill();
@@ -53,6 +51,7 @@ namespace TestApp
 
         private void FillDepartmentsTreeView()
         {
+            GlobalVars.Log.Info("MainForm: Заполнение DepartmentsTreeView");
             TreeView_Departments.Nodes.Clear();
 
             using (var db = new TestDBEntities())
@@ -78,6 +77,7 @@ namespace TestApp
 
         private void FillDataGridViewEmployers()
         {
+            GlobalVars.Log.Info("MainForm: Заполнение DataGridViewEmployers");
             var selectedDepartmentId = new Guid(TreeView_Departments.SelectedNode.Name);
 
             using (var db = new TestDBEntities())
@@ -106,6 +106,7 @@ namespace TestApp
 
         private void RecursiveDeleteDepartmentEmployers(List<Department> departmentlist, Department department, TestDBEntities db)
         {
+            GlobalVars.Log.Info("MainForm: Рекурсивное удаление сотрудников из удаляемого отдела");
             foreach (var childDepartament in department.ChildDepartaments)
                 RecursiveDeleteDepartmentEmployers(departmentlist, childDepartament, db);
 
@@ -135,6 +136,7 @@ namespace TestApp
 
         private void Button_AddEmployee_Click(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("MainForm: Добавление сотрудника");
             Guid? selectedDepartmentId = null;
 
             if (TreeView_Departments.SelectedNode != null)
@@ -149,6 +151,7 @@ namespace TestApp
 
         private void Button_EditEmployee_Click(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("MainForm: Редактирование сотрудника");
             if (DataGridView_Employers.SelectedRows.Count != 0)
             {
                 var selectedRowIndex = DataGridView_Employers.CurrentRow.Index;
@@ -169,6 +172,7 @@ namespace TestApp
 
         private void Button_RemoveEmployee_Click(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("MainForm: Удаление сотрудника");
             if (DataGridView_Employers.SelectedRows.Count != 0)
             {
                 var employeeId = Convert.ToDecimal(DataGridView_Employers.SelectedRows[0].Cells["ID"].Value);
@@ -194,6 +198,7 @@ namespace TestApp
 
         private void Button_AddDepartment_Click(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("MainForm: Добавление отдела");
             var form = new DepartmentInfoEditForm {Owner = this};
             form.ShowDialog();
             FillDepartmentsTreeView();
@@ -201,6 +206,7 @@ namespace TestApp
 
         private void Button_EditDepartment_Click(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("MainForm: Редактирование отдела");
             if (TreeView_Departments.SelectedNode != null)
             {
                 var selectedDepartmentId = new Guid(TreeView_Departments.SelectedNode.Name);
@@ -212,6 +218,7 @@ namespace TestApp
 
         private void Button_DeleteDepartment_Click(object sender, EventArgs e)
         {
+            GlobalVars.Log.Info("MainForm: Удаление отдела");
             using (var db = new TestDBEntities())
             {
                 var selectedDepartmentId = new Guid(TreeView_Departments.SelectedNode.Name);
